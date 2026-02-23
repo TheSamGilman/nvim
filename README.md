@@ -6,22 +6,27 @@ Leader key is `<Space>`. Tabs are 2 spaces. Format-on-save is enabled for Python
 
 ## Keybindings
 
-| Key | Action |
-|-----|--------|
-| `<Space>c` | Copy to system clipboard (normal/visual) |
-| `<Space>f` | Telescope find files |
-| `<Space>g` | Telescope live grep |
-| `<Space>t` | Toggle floating terminal |
-| `gt` / `gT` | Next / previous buffer tab |
-| `<C-t>` | Toggle floating terminal (toggleterm mapping) |
-| `<Esc>` | Close telescope picker / close terminal window |
-| `<Tab>` / `<S-Tab>` | Cycle through completion menu |
-| `<CR>` | Confirm completion selection |
-| `<C-n>` / `<C-p>` | Next/prev completion item (also Copilot accept_word) |
-| `<C-Space>` | Accept Copilot suggestion |
-| `<C-l>` | Accept Copilot line |
-| `<C-j>` / `<C-k>` | Next/prev Copilot suggestion |
-| `gc` / `gcc` | Toggle comment (line/motion) via Comment.nvim |
+| Key | Mode | Action |
+|-----|------|--------|
+| `<Space>c` | n/v | Copy to system clipboard |
+| `<Space>f` | n | Telescope find files |
+| `<Space>g` | n | Telescope live grep |
+| `<Space>t` | n | Toggle floating terminal |
+| `<Space>e` | n | Show diagnostic float for current line |
+| `gt` / `gT` | n | Next / previous buffer tab |
+| `]d` / `[d` | n | Jump to next / previous diagnostic |
+| `K` | n | Hover docs (type info, documentation) |
+| `<C-t>` | n | Toggle floating terminal |
+| `<Esc>` | — | Close telescope picker / close terminal window |
+| `<Tab>` / `<S-Tab>` | i | Cycle through completion menu |
+| `<CR>` | i | Confirm completion selection |
+| `<C-n>` / `<C-p>` | i | Next / prev completion item |
+| `<C-k>` | i | Signature help (show function parameters) |
+| `<C-Space>` | i | Accept Copilot suggestion |
+| `<C-f>` | i | Accept Copilot word |
+| `<C-l>` | i | Accept Copilot line |
+| `<C-j>` / `<C-b>` | i | Next / prev Copilot suggestion |
+| `gc` / `gcc` | n | Toggle comment (motion / current line) |
 
 ## Plugins
 
@@ -45,7 +50,7 @@ Leader key is `<Space>`. Tabs are 2 spaces. Format-on-save is enabled for Python
 
 ## LSP Setup
 
-Uses a compat helper that tries the Neovim 0.11+ API (`vim.lsp.config`/`vim.lsp.enable`) first, then falls back to the traditional lspconfig `setup()` call. Servers: pyright for Python, ts_ls (or tsserver on older lspconfig) for JS/TS.
+Uses lspconfig directly. Servers: pyright for Python, ts_ls (or tsserver on older lspconfig) for JS/TS. Hover docs and signature help are bound to `K` and `<C-k>` with rounded float styling. Diagnostics are shown via `<Space>e` and navigated with `]d`/`[d`. Float windows use a distinct background and wrap long lines.
 
 ## Installation
 

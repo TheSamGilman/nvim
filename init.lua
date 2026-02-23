@@ -43,7 +43,8 @@ vim.opt.ignorecase = true -- case-insensitive search...
 vim.opt.smartcase = true -- ...unless query has uppercase
 vim.opt.hlsearch = true -- highlight search matches
 vim.opt.incsearch = true -- show matches as you type
-vim.opt.undofile = true -- persist undo history across sessions
+vim.opt.undofile = true  -- persist undo history across sessions
+vim.opt.swapfile = false -- disable swap files (undofile covers crash recovery)
 vim.opt.termguicolors = true -- 24-bit color
 vim.opt.wrap = false -- no line wrapping
 vim.opt.shada = "'1000,<50,s10,h" -- remember 1000 marks, 50 register lines
@@ -62,6 +63,21 @@ vim.keymap.set("n", "gT", ":BufferLineCyclePrev<CR>", { noremap = true, silent =
 
 -- toggle floating terminal
 vim.keymap.set("n", "<leader>t", "<cmd>1ToggleTerm direction=float<CR>", { noremap = true, silent = true })
+
+-- diagnostics
+vim.keymap.set("n", "<leader>e", function()
+	vim.diagnostic.open_float({ border = "rounded" })
+end, { desc = "Show diagnostic" })
+vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
+vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Prev diagnostic" })
+
+-- LSP hover and signature help
+vim.keymap.set("n", "K", function()
+	vim.lsp.buf.hover({ border = "rounded", max_width = 80 })
+end, { desc = "Hover docs" })
+vim.keymap.set("i", "<C-k>", function()
+	vim.lsp.buf.signature_help({ border = "rounded", max_width = 80 })
+end, { desc = "Signature help" })
 
 -- ── Autocmds ─────────────────────────────────────────────────────────────────
 -- restore cursor position from shada on file open
@@ -111,6 +127,15 @@ vim.api.nvim_create_autocmd("FileType", {
 	command = "setlocal formatoptions-=cro",
 })
 
+-- enable line wrap in floating windows (overrides global wrap=false)
+vim.api.nvim_create_autocmd("WinEnter", {
+	callback = function()
+		if vim.api.nvim_win_get_config(0).relative ~= "" then
+			vim.wo.wrap = true
+		end
+	end,
+})
+
 -- force redraw on resize/window events
 local function handle_resize()
 	vim.schedule(function()
@@ -125,7 +150,10 @@ vim.api.nvim_create_autocmd({ "VimResized", "VimEnter", "WinEnter" }, {
 
 -- ── Colorscheme ──────────────────────────────────────────────────────────────
 vim.cmd([[colorscheme nord]])
-vim.api.nvim_set_hl(0, "@comment", { fg = "#93A0BA" }) -- brighter comment color
+vim.api.nvim_set_hl(0, "@comment", { fg = "#93A0BA" })        -- brighter comment color
+vim.api.nvim_set_hl(0, "NormalFloat", { bg = "#3B4252" })     -- float background (nord1)
+vim.api.nvim_set_hl(0, "FloatBorder", { fg = "#000000", bg = "#3B4252" }) -- float border (black)
+
 
 -- ── Formatters (none-ls) ─────────────────────────────────────────────────────
 local null_ls = require("null-ls")
@@ -143,28 +171,15 @@ require("prettier").setup({
 })
 
 -- ── LSP ──────────────────────────────────────────────────────────────────────
--- supports both Neovim 0.11+ (vim.lsp.config/enable) and older lspconfig API
-local function enable_server(name, opts)
-	opts = opts or {}
-	if vim.lsp and vim.lsp.config and vim.lsp.enable then
-		vim.lsp.config(name, opts)
-		vim.lsp.enable(name)
-		return true
-	else
-		local ok, lspconfig = pcall(require, "lspconfig")
-		if ok and lspconfig[name] and lspconfig[name].setup then
-			lspconfig[name].setup(opts)
-			return true
-		end
-	end
-	return false
-end
+local lspconfig = require("lspconfig")
 
-enable_server("pyright", {})
+lspconfig.pyright.setup({})
 
 -- tsserver was renamed to ts_ls in newer lspconfig
-if not enable_server("ts_ls", {}) then
-	enable_server("tsserver", {})
+if lspconfig.ts_ls then
+	lspconfig.ts_ls.setup({})
+else
+	lspconfig.tsserver.setup({})
 end
 
 -- ── Treesitter ───────────────────────────────────────────────────────────────
@@ -180,10 +195,10 @@ require("copilot").setup({
 		auto_trigger = true,
 		keymap = {
 			accept = "<C-Space>",
-			accept_word = "<C-n>",
+			accept_word = "<C-f>",
 			accept_line = "<C-l>",
 			next = "<C-j>",
-			prev = "<C-k>",
+			prev = "<C-b>",
 		},
 	},
 })
