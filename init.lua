@@ -22,7 +22,6 @@ require("packer").startup(function(use)
 	use({ "nvim-telescope/telescope.nvim", tag = "0.1.8", requires = { "nvim-lua/plenary.nvim" } })
 	use("nvim-tree/nvim-web-devicons")
 	use({ "nvim-treesitter/nvim-treesitter", run = ":TSUpdate" })
-	use("MeanderingProgrammer/render-markdown.nvim")
 	use("shaunsingh/nord.nvim")
 	use("wbthomason/packer.nvim")
 	use("zbirenbaum/copilot.lua")
@@ -175,20 +174,6 @@ if ok_lualine then
 	lualine.setup({
 		options = {
 			theme = "nord",
-		},
-	})
-end
-
--- Render-markdown setup with protection
-local ok_rm, render_markdown = pcall(require, "render-markdown")
-if ok_rm then
-	render_markdown.setup({
-		checkbox = {
-			unchecked = { icon = "󰄱 " },
-			checked = { icon = "󰱒 " },
-			custom = {
-				cancelled = { raw = "[-]", rendered = "󰜺 ", highlight = "RenderMarkdownError" },
-			},
 		},
 	})
 end
