@@ -57,6 +57,7 @@ vim.opt.tabstop = 2
 vim.opt.termguicolors = true
 vim.opt.updatetime = 100
 vim.opt.textwidth = 0
+vim.opt.autoread = true
 vim.o.pumblend = 40
 
 vim.api.nvim_set_keymap("v", "<leader>c", '"+y', { noremap = true, silent = true })
@@ -120,29 +121,21 @@ vim.api.nvim_create_autocmd("TermOpen", {
 	end,
 })
 
-vim.api.nvim_create_autocmd({ "CursorHold", "FocusGained", "BufEnter" }, {
-	pattern = "*",
-	command = "checktime",
-})
-
-vim.api.nvim_create_autocmd("FileChangedShellPost", {
-	pattern = "*",
-	command = "echohl WarningMsg | echo 'File changed on disk. Reloading...' | echohl None | edit!",
-})
+-- Poll for external file changes every 1s (fires even when nvim is unfocused)
+local checktime_timer = vim.uv.new_timer()
+checktime_timer:start(
+	1000,
+	1000,
+	vim.schedule_wrap(function()
+		if vim.api.nvim_get_mode().mode == "n" then
+			pcall(vim.cmd, "silent! checktime")
+		end
+	end)
+)
 
 vim.api.nvim_create_autocmd("FileType", {
 	pattern = "*",
 	command = "setlocal formatoptions-=cro",
-})
-
-vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter" }, {
-	pattern = "*",
-	command = "checktime",
-})
-
-vim.api.nvim_create_autocmd("FileChangedShellPost", {
-	pattern = "*",
-	command = "echohl WarningMsg | echo 'File changed on disk. Reloading...' | echohl None | edit!",
 })
 
 -- Treesitter setup with protection
