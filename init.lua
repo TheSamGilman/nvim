@@ -185,7 +185,7 @@ if ok_rm then
 	render_markdown.setup({
 		checkbox = {
 			unchecked = { icon = "󰄱 " },
-			checked = { icon = "󰱒 ", scope_highlight = "@markup.strikethrough" },
+			checked = { icon = "󰱒 " },
 			custom = {
 				cancelled = { raw = "[-]", rendered = "󰜺 ", highlight = "RenderMarkdownError" },
 			},
